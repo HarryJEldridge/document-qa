@@ -74,18 +74,64 @@ Layout: Mobile-first, 430px max-width
 ## Project Structure
 
 ```
-src/
-  data-sources/     # One file per integration (fetch only)
-  briefing/         # Assembles context from all sources
-  claude.ts         # Claude API calls
-  server.ts         # Express API server
-  cli.ts            # Morning briefing CLI entry point
+personal-os/
+├── CLAUDE.md                        ← Claude Code context file
+├── package.json
+├── tsconfig.json
+├── .env.example
+│
+├── src/
+│   ├── index.ts                     ← CLI entry point
+│   ├── server.ts                    ← Express API server (port 3000)
+│   │
+│   ├── data-sources/                ← One file per integration (fetch only)
+│   │   ├── reminders.ts             ← Apple Reminders (MCP)
+│   │   ├── calendar.ts              ← Google/Outlook Calendar (MCP)
+│   │   ├── gmail.ts                 ← Gmail (MCP)
+│   │   ├── health.ts                ← Apple Health / Oura API
+│   │   ├── confluence.ts            ← Confluence REST API
+│   │   ├── hubspot.ts               ← HubSpot API
+│   │   ├── jira.ts                  ← Jira REST API
+│   │   ├── excel.ts                 ← Excel model parser
+│   │   └── web.ts                   ← Weather, news, sports (web search)
+│   │
+│   ├── briefing/
+│   │   ├── builder.ts               ← Assembles context payload
+│   │   ├── claude.ts                ← Claude API call + prompt
+│   │   └── renderer.ts              ← CLI vs HTML output formatting
+│   │
+│   ├── crm/
+│   │   ├── contacts.ts              ← Personal CRM layer
+│   │   └── schema.ts                ← Contact data types
+│   │
+│   ├── db/
+│   │   ├── client.ts                ← SQLite connection
+│   │   └── migrations/              ← Schema versioning
+│   │
+│   └── types/
+│       └── index.ts                 ← Shared TypeScript types
+│
+├── web/                             ← React frontend
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── components/
+│   │   │   ├── BriefingCard.tsx
+│   │   │   ├── HealthPanel.tsx
+│   │   │   ├── CalendarPanel.tsx
+│   │   │   ├── RemindersPanel.tsx
+│   │   │   └── MetricsPanel.tsx
+│   │   └── design/
+│   │       └── tokens.ts            ← Design tokens (#0b0d11, #5b8dee, fonts)
+│   └── vite.config.ts
+│
+└── docs/
+    └── personal-os.docx             ← Full spec
 ```
 
 **Coding conventions:**
 - TypeScript strict mode throughout
 - Never hardcode API keys — always `.env`
-- Single responsibility: data sources fetch, briefing assembles, `claude.ts` calls API
+- Single responsibility: `data-sources/` fetches, `briefing/` assembles, `claude.ts` calls API
 - All data sources return a typed context object, never raw API responses
 
 ---

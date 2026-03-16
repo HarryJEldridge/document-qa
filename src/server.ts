@@ -3,9 +3,20 @@ import express, { Request, Response } from 'express';
 import { spawn } from 'child_process';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { networkInterfaces } from 'os';
 import { migrate } from './db/migrate';
 import db from './db/client';
 import type { StoredBriefing } from './types/index';
+
+function getLanIp(): string | null {
+  const nets = networkInterfaces();
+  for (const iface of Object.values(nets)) {
+    for (const net of iface ?? []) {
+      if (net.family === 'IPv4' && !net.internal) return net.address;
+    }
+  }
+  return null;
+}
 
 const app = express();
 const PORT = parseInt(process.env.PORT ?? '3000', 10);
@@ -97,12 +108,13 @@ if (existsSync(webDist)) {
 
 migrate();
 
-app.listen(PORT, () => {
-  console.log(`Personal OS API → http://localhost:${PORT}`);
-  if (existsSync(webDist)) {
-    console.log(`  Dashboard → http://localhost:${PORT}`);
+// Bind to 0.0.0.0 so the server is reachable from other devices on the LAN
+app.listen(PORT, '0.0.0.0', () => {
+  const lan = getLanIp();
+  console.log(`\nPersonal OS running\n`);
+  console.log(`  Local   → http://localhost:${PORT}`);
+  if (lan) {
+    console.log(`  iPhone  → http://${lan}:${PORT}  ← open this on your phone`);
   }
-  console.log(`  GET  /api/briefings/latest`);
-  console.log(`  GET  /api/briefings`);
-  console.log(`  POST /api/briefings/generate`);
+  console.log('');
 });

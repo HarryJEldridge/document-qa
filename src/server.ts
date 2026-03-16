@@ -1,10 +1,8 @@
-/**
- * Express API server — serves stored briefings to the React dashboard.
- * Phase 1: read-only briefing history.
- * Phase 2: add real-time data endpoints, CRM CRUD, and webhook triggers.
- */
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
+import { spawn } from 'child_process';
+import { join } from 'path';
+import { existsSync } from 'fs';
 import { migrate } from './db/migrate';
 import db from './db/client';
 import type { StoredBriefing } from './types/index';
@@ -61,12 +59,50 @@ app.get('/api/briefings/:id', (req: Request, res: Response) => {
   res.json(row);
 });
 
+// POST /api/briefings/generate — spawns the CLI briefing process
+app.post('/api/briefings/generate', (_req: Request, res: Response) => {
+  const proc = spawn(
+    'npx',
+    ['ts-node', 'src/index.ts'],
+    {
+      cwd: join(__dirname, '..'),
+      env: process.env,
+      stdio: 'pipe',
+    }
+  );
+
+  // Fire-and-forget: client polls /api/briefings/latest for the result
+  res.json({ ok: true, message: 'Briefing generation started' });
+
+  proc.on('error', (err) => {
+    console.error('[generate] spawn error:', err.message);
+  });
+  proc.on('close', (code) => {
+    console.log(`[generate] process exited with code ${code}`);
+  });
+});
+
+// ── Serve React web build in production ───────────────────────────────────────
+
+const webDist = join(__dirname, '..', 'web', 'dist');
+if (existsSync(webDist)) {
+  app.use(express.static(webDist));
+  // SPA fallback — serve index.html for all non-API routes
+  app.get('*', (_req: Request, res: Response) => {
+    res.sendFile(join(webDist, 'index.html'));
+  });
+}
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 
 migrate();
 
 app.listen(PORT, () => {
   console.log(`Personal OS API → http://localhost:${PORT}`);
-  console.log(`  GET /api/briefings/latest`);
-  console.log(`  GET /api/briefings`);
+  if (existsSync(webDist)) {
+    console.log(`  Dashboard → http://localhost:${PORT}`);
+  }
+  console.log(`  GET  /api/briefings/latest`);
+  console.log(`  GET  /api/briefings`);
+  console.log(`  POST /api/briefings/generate`);
 });

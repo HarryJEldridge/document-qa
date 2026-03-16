@@ -6,7 +6,9 @@
   "scripts": {
     "brief": "ts-node src/index.ts",
     "dev": "ts-node src/server.ts",
-    "build": "tsc",
+    "dev:web": "npm run dev --prefix web",
+    "build": "tsc && npm run build --prefix web",
+    "build:web": "npm run build --prefix web",
     "db:migrate": "ts-node src/db/migrate.ts"
   },
   "dependencies": {

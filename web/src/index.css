@@ -1,0 +1,103 @@
+:root {
+  --bg: #0b0d11;
+  --surface: #12151c;
+  --surface-2: #191d27;
+  --accent: #5b8dee;
+  --green: #5bc4a0;
+  --warn: #e0b86a;
+  --red: #e07878;
+  --text: #e8eaf0;
+  --text-muted: #6b7280;
+  --border: rgba(255, 255, 255, 0.06);
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --max-w: 430px;
+  --radius: 12px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background: var(--bg);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+  overscroll-behavior-y: contain;
+}
+
+#root {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+/* Markdown content styles */
+.briefing-content p {
+  margin-bottom: 10px;
+}
+
+.briefing-content ul,
+.briefing-content ol {
+  padding-left: 18px;
+  margin-bottom: 10px;
+}
+
+.briefing-content li {
+  margin-bottom: 3px;
+}
+
+.briefing-content strong {
+  color: var(--accent);
+  font-family: var(--font-heading);
+  font-size: 1.05em;
+  letter-spacing: 0.06em;
+}
+
+.briefing-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 14px 0;
+}
+
+.briefing-content code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
